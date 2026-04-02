@@ -1,1 +1,32 @@
+const express = require('express');
+const cors = require('cors');
+const app = express();
 
+app.use(express.json());
+
+// Allow your frontend (update after deploying frontend)
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://YOUR-FRONTEND.onrender.com'], // ← update later
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
+
+let investments = [];
+
+app.post('/api/invest', (req, res) => {
+  investments.push(req.body);
+  console.log('💰 Investment received:', req.body);
+  res.json({ success: true, message: 'Investment saved' });
+});
+
+app.post('/api/support', (req, res) => {
+  console.log('📨 Support message to Ben:', req.body);
+  res.json({ success: true });
+});
+
+app.get('/api/portfolio', (req, res) => {
+  res.json({ total: 14872.45, holdings: [] });
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
