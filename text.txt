@@ -1,0 +1,55 @@
+const express = require('express');
+const cors = require('cors');
+const app = express();
+
+app.use(express.json());
+
+// ✅ Allow your frontend domain (change to your actual Render static URL after deploy)
+const allowedOrigins = [
+  'http://localhost:3000',           // for local testing
+  'https://your-frontend.onrender.com'  // ← REPLACE with your static site URL
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Handle preflight OPTIONS requests
+app.options('*', cors());
+
+// Your existing routes
+let investments = [];
+
+app.post('/api/invest', (req, res) => {
+  investments.push(req.body);
+  console.log('💰 New investment from frontend:', req.body);
+  res.json({ success: true, message: 'Investment recorded successfully' });
+});
+
+app.post('/api/support', (req, res) => {
+  console.log('📨 Support message to Ben:', req.body);
+  res.json({ success: true, telegram: 'https://t.me/YOUR_TELEGRAM_USERNAME' }); // ← CHANGE THIS
+});
+
+app.get('/api/portfolio', (req, res) => {
+  res.json({
+    total: 14872.45,
+    holdings: [
+      { symbol: "BTC", amount: 0.214, value: 14620 },
+      { symbol: "ETH", amount: 4.85, value: 16620 }
+    ]
+  });
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`✅ Backend running on port ${PORT}`);
+});
